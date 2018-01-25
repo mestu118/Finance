@@ -1,4 +1,4 @@
-from cs50 import SQL
+from cs50 import SQL, eprint
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from passlib.apps import custom_app_context as pwd_context
@@ -51,6 +51,10 @@ def buy():
         if stock == None:
             return apology("Not valid stock")
         else:
+            purchase = db.execute("INSERT INTO portfolio (symbol, shares, price) VALUES (:sy, :sh, :p)", sy = stock['symbol'], sh = int(request.form.get('amount')), p = stock['price'])
+            if not purchase:
+                return apology("didn't purchase succesfully")
+
             return apology("sucessfully purchased stock")
     else:
         return render_template("buy.html")
