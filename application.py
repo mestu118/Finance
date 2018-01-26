@@ -34,7 +34,10 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    return apology("You're logged in")
+    testing = db.execute("SELECT portfolio.symbol, portfolio.price, SUM(portfolio.shares) AS sum FROM portfolio GROUP BY portfolio.symbol")
+    cash = db.execute("SELECT cash FROM users WHERE id = :i", i =  session["user_id"])
+    eprint(testing)
+    return render_template("index.html", testing = testing, cash = cash)
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -51,11 +54,19 @@ def buy():
         if stock == None:
             return apology("Not valid stock")
         else:
-            purchase = db.execute("INSERT INTO portfolio (symbol, shares, price) VALUES (:sy, :sh, :p)", sy = stock['symbol'], sh = int(request.form.get('amount')), p = stock['price'])
+            cash = db.execute("SELECT cash FROM users WHERE id = :i", i =  session["user_id"])
+
+            if int(request.form.get('amount'))*stock['price'] > cash[0]['cash']:
+                return apology("You don't have enough money to purchas this much")
+
+            db.execute("UPDATE users SET cash = cash - :c WHERE id = :i", c = int(request.form.get('amount')) * stock['price'], i = session["user_id"])
+            purchase = db.execute("INSERT INTO portfolio (symbol, shares, price, id) VALUES (:sy, :sh, :p, :i)",
+            sy = stock['symbol'], sh = int(request.form.get('amount')), p = stock['price'], i = session["user_id"])
+
             if not purchase:
                 return apology("didn't purchase succesfully")
 
-            return apology("sucessfully purchased stock")
+            return redirect(url_for("index"))
     else:
         return render_template("buy.html")
 
