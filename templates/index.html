@@ -24,13 +24,13 @@
                     <p> {{test['symbol']}}</p>
                 </td>
                 <td>
-                    <p> {{test['price']}}</p>
+                    <p><span class="dollars"> {{test['price']}} </span></p>
                 </td>
                 <td>
                     <p>{{test['sum']}}</p>
                 </td>
                 <td>
-                    <p> {{test['sum']*test['price']}}</p>
+                    <p><span class="dollars"> {{test['sum']*test['price']}}</span></p>
                 </td>
                 </tr>
                 {% endfor %}
@@ -40,7 +40,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td> {{cash[0]['cash']}}</td>
+                    <td><span class="dollars"> {{cash[0]['cash']}}</td> </span>
                 </tr>
                 <tr>
                     <td>Grand Total</td>
@@ -52,7 +52,7 @@
                     {% for test in testing %}
                         {% if ran.append(ran.pop() + test['sum']*test['price']) %}{% endif %}
                     {% endfor %}
-                    {{ ran.pop() }}
+                    <span class="dollars"> {{ ran.pop() }} </span>
                     </td>
                 </tr>
             </table>
