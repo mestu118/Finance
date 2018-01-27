@@ -73,7 +73,8 @@ def buy():
 @login_required
 def history():
     """Show history of transactions."""
-    return apology("TODO")
+    portfolio = db.execute("SELECT portfolio.symbol, portfolio.price, portfolio.shares, portfolio.transacted FROM portfolio GROUP BY id = :i", i = session["user_id"])
+    return render_template("history.html", portfolio = portfolio)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

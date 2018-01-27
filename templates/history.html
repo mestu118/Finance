@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+<!--show whether a stock was bought or sold-->
+<!--show the stock symbol-->
+<!--show the puchase price or sale-->
+<!--number of shares bought or sold-->
+<!--date and time which transaction occurred-->
+{% block main %}
+<table style = "width:100%">
+    <tr>
+        <th>Symbol</th>
+        <th> Price</th>
+        <th> Shares</th>
+        <th> Transction Date</th>
+    </tr>
+    {% for purchase in portfolio %}
+    <tr>
+        <td> {{ purchase["symbol"] }}</td>
+        <td> {{ purchase["price"] }}</td>
+        <td> {{ purchase["shares"] }}</td>
+        <td> {{ purchase["transacted"] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
