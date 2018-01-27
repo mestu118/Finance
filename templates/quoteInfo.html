@@ -5,15 +5,11 @@
 {% endblock %}
 
 {% block main %}
-    <form action="{{ url_for('buy') }}" method="post">
+
         <fieldset>
             <p>Stock: {{stock['name']}} </p>
             <p>Price: {{stock['price']}}</p>
             <p>Symbol: {{stock['symbol']}}</p>
-
-            <div class="form-group">
-                <button class="btn btn-default" type="submit">Purchase</button>
-            </div>
         </fieldset>
 
     </form>

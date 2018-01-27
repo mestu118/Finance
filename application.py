@@ -34,7 +34,7 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    testing = db.execute("SELECT portfolio.symbol, portfolio.price, SUM(portfolio.shares) AS sum FROM portfolio GROUP BY portfolio.symbol")
+    testing = db.execute("SELECT portfolio.symbol, portfolio.price, SUM(portfolio.shares) AS sum FROM portfolio WHERE id = :i GROUP BY portfolio.symbol", i = session["user_id"])
     cash = db.execute("SELECT cash FROM users WHERE id = :i", i =  session["user_id"])
     return render_template("index.html", testing = testing, cash = cash)
 
@@ -55,6 +55,9 @@ def buy():
         else:
             cash = db.execute("SELECT cash FROM users WHERE id = :i", i =  session["user_id"])
 
+            if int(request.form.get('amount')) <= 0:
+                return apology("Enter a positive number to buy")
+
             if int(request.form.get('amount'))*stock['price'] > cash[0]['cash']:
                 return apology("You don't have enough money to purchas this much")
 
@@ -73,7 +76,7 @@ def buy():
 @login_required
 def history():
     """Show history of transactions."""
-    portfolio = db.execute("SELECT portfolio.symbol, portfolio.price, portfolio.shares, portfolio.transacted FROM portfolio GROUP BY id = :i", i = session["user_id"])
+    portfolio = db.execute("SELECT portfolio.symbol, portfolio.price, portfolio.shares, portfolio.transacted FROM portfolio WHERE id = :i", i = session["user_id"])
     return render_template("history.html", portfolio = portfolio)
 
 @app.route("/login", methods=["GET", "POST"])
@@ -179,7 +182,7 @@ def register():
 def sell():
     """Sell shares of stock."""
     # stocks = db.execute("SELECT portfolio.symbol FROM portfolio GROUP BY portfolio.symbol")
-    portfolio = db.execute("SELECT portfolio.symbol, SUM(portfolio.shares) AS sum FROM portfolio GROUP BY portfolio.symbol")
+    portfolio = db.execute("SELECT portfolio.symbol, SUM(portfolio.shares) AS sum FROM portfolio WHERE id = :i GROUP BY portfolio.symbol", i = session["user_id"])
     if request.method == "POST":
         if not request.form.get("symbol"):
             return apology("Select Stock to Sell")
@@ -207,3 +210,8 @@ def sell():
         return redirect(url_for("index"))
     else:
         return render_template("sell.html", stocks = portfolio)
+
+@app.route("/addCash", methods=["GET", "POST"])
+@login_required
+def addCash():
+    return apology("Adding cash page successful")
