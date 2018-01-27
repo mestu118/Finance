@@ -178,7 +178,8 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock."""
+    stocks = db.execute("SELECT portfolio.symbol FROM portfolio GROUP BY portfolio.symbol")
     if request.method == "POST":
         return apology("SOLD IT")
     else:
-        return render_template("sell.html")
+        return render_template("sell.html", stocks = stocks)

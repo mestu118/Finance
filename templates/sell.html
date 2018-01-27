@@ -4,7 +4,15 @@
     <form action="{{ url_for('sell') }}" method="post">
         <fieldset>
             <div class = "form-group">
-                <input autocomplete = "off" autofocus class = "form-control" name = "stock" placeholder = "Stock" type = "text"/>
+                <select class = "form-control" name="symbol">
+                    <option disabld selected value> Symbol </option>
+                    {% for stock in stocks %}
+                    <option value="stock"> {{ stock['symbol'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-default" type="submit">Sell Stock</button>
             </div>
         </fieldset>
     </form>
