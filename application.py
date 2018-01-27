@@ -214,4 +214,15 @@ def sell():
 @app.route("/addCash", methods=["GET", "POST"])
 @login_required
 def addCash():
-    return apology("Adding cash page successful")
+    """Add more cash """
+    if request.method == "POST":
+        if not request.form.get("cash"):
+            return apology("Enter Amount of Cash")
+        cash = int(request.form.get("cash"))
+        if cash <= 0:
+            return apology("Enter valid amount of cash")
+        db.execute("UPDATE users SET cash = cash + :c WHERE id = :i", c = cash, i = session["user_id"])
+
+        return redirect(url_for("index"))
+    else:
+        return render_template("addCash.html")
