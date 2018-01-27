@@ -36,7 +36,6 @@ db = SQL("sqlite:///finance.db")
 def index():
     testing = db.execute("SELECT portfolio.symbol, portfolio.price, SUM(portfolio.shares) AS sum FROM portfolio GROUP BY portfolio.symbol")
     cash = db.execute("SELECT cash FROM users WHERE id = :i", i =  session["user_id"])
-    eprint(testing)
     return render_template("index.html", testing = testing, cash = cash)
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -178,8 +177,32 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock."""
-    stocks = db.execute("SELECT portfolio.symbol FROM portfolio GROUP BY portfolio.symbol")
+    # stocks = db.execute("SELECT portfolio.symbol FROM portfolio GROUP BY portfolio.symbol")
+    portfolio = db.execute("SELECT portfolio.symbol, SUM(portfolio.shares) AS sum FROM portfolio GROUP BY portfolio.symbol")
     if request.method == "POST":
-        return apology("SOLD IT")
+        if not request.form.get("symbol"):
+            return apology("Select Stock to Sell")
+        if not request.form.get("shares"):
+            return apology("Select Number of Shares to Sell")
+        if int(request.form.get("shares")) <= 0:
+            return apology("Select valid number of Shares to Sell")
+
+        stockLookUp = lookup(request.form.get("symbol"))
+        if stockLookUp == None:
+            return apology("Not valid stock")
+        numberOfShares = 0
+        for i in range(0, len(portfolio)):
+            if(request.form.get("symbol") == portfolio[i]["symbol"]):
+                numberOfShares = portfolio[i]["sum"]
+                break
+
+        if(int(request.form.get("shares")) > numberOfShares):
+            return apology("You can't sell that many shares")
+        sell = db.execute("INSERT INTO portfolio (symbol, shares, price, id) VALUES (:sy, :sh, :p, :i)",
+            sy = stockLookUp["symbol"], sh = -int(request.form.get("shares")), p = stockLookUp["price"], i = session["user_id"])
+
+        db.execute("UPDATE users SET cash = cash + :c WHERE id = :i", c = int(request.form.get("shares")) * stockLookUp['price'], i = session["user_id"])
+
+        return redirect(url_for("index"))
     else:
-        return render_template("sell.html", stocks = stocks)
+        return render_template("sell.html", stocks = portfolio)

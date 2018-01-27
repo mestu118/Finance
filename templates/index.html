@@ -15,7 +15,7 @@
                     <th> Number of Shares Owned</th>
                     <th> Total </th>
                 </tr>
-                {% for test in testing %}
+                {% for test in testing if not test['sum']==0 %}
                 <tr>
                 <td>
                     <p> {{test['symbol']}}</p>
