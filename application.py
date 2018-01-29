@@ -43,27 +43,32 @@ def index():
 def buy():
     """Buy shares of stock."""
     if request.method == "POST":
-        if not request.form.get("stock"):
+        if not request.form.get("symbol"):
             return apology("Enter a symbol for a stock")
 
-        if not request.form.get("amount"):
+        if not request.form.get("shares"):
             return apology("Enter a number of shares")
 
-        stock = lookup(request.form.get("stock"))
+
+
+        stock = lookup(request.form.get("symbol"))
         if stock == None:
             return apology("Not valid stock")
         else:
             cash = db.execute("SELECT cash FROM users WHERE id = :i", i =  session["user_id"])
 
-            if int(request.form.get('amount')) <= 0:
+            if not (request.form.get('shares')).isnumeric():
+                return apology("Enter a valid integer number")
+
+            if int(request.form.get('shares')) <= 0:
                 return apology("Enter a positive number to buy")
 
-            if int(request.form.get('amount'))*stock['price'] > cash[0]['cash']:
+            if int(request.form.get('shares'))*stock['price'] > cash[0]['cash']:
                 return apology("You don't have enough money to purchas this much")
 
-            db.execute("UPDATE users SET cash = cash - :c WHERE id = :i", c = int(request.form.get('amount')) * stock['price'], i = session["user_id"])
+            db.execute("UPDATE users SET cash = cash - :c WHERE id = :i", c = int(request.form.get('shares')) * stock['price'], i = session["user_id"])
             purchase = db.execute("INSERT INTO portfolio (symbol, shares, price, id) VALUES (:sy, :sh, :p, :i)",
-            sy = stock['symbol'], sh = int(request.form.get('amount')), p = stock['price'], i = session["user_id"])
+            sy = stock['symbol'], sh = int(request.form.get('shares')), p = stock['price'], i = session["user_id"])
 
             if not purchase:
                 return apology("didn't purchase succesfully")
@@ -134,9 +139,9 @@ def quote():
     """Get stock quote."""
 
     if request.method == "POST":
-        if not request.form.get("stock"):
+        if not request.form.get("symbol"):
             return apology("Enter a symbol for a stock")
-        stock = lookup(request.form.get("stock"))
+        stock = lookup(request.form.get("symbol"))
         if stock == None:
             return apology("Not valid stock")
         else:

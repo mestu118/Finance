@@ -4,10 +4,10 @@
         <fieldset>
             <table style="width:100%">
                 <tr>
-                    <th> Stock Symbol </th>
-                    <th> Stock Name </th>
+                    <th> Symbol </th>
+                    <th> Name </th>
                     <th> Price of Stock </th>
-                    <th> Number of Shares Owned</th>
+                    <th> Shares </th>
                     <th> Total </th>
                 </tr>
                 {% for test in testing if not test['sum']==0 %}
@@ -19,13 +19,13 @@
                     <p> {{test['symbol']}}</p>
                 </td>
                 <td>
-                    <p><span class="dollars"> {{test['price']}} </span></p>
+                    <p>{{"$%.2f"|format(test['price'])}} </p>
                 </td>
                 <td>
                     <p>{{test['sum']}}</p>
                 </td>
                 <td>
-                    <p><span class="dollars"> {{test['sum']*test['price']}}</span></p>
+                    <p>{{"$%.2f"|format(test['sum']*test['price'])}}</p>
                 </td>
                 </tr>
                 {% endfor %}
@@ -35,7 +35,7 @@
                     <td></td>
                     <td></td>
                     <td>Current Amount of Cash</td>
-                    <td><span class="dollars"> {{cash[0]['cash']}}</td> </span>
+                    <td>{{"$%.2f"|format(cash[0]['cash'])}}</span>
                 </tr>
                 <tr>
                     <td></td>
@@ -47,7 +47,7 @@
                     {% for test in testing %}
                         {% if ran.append(ran.pop() + test['sum']*test['price']) %}{% endif %}
                     {% endfor %}
-                    <span class="dollars"> {{ ran.pop() }} </span>
+                    {{"$%.2f"|format(ran.pop())}}
                     </td>
                 </tr>
             </table>
